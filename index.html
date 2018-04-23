@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+    <link rel="stylesheet" href="./style.css" type="text/css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body onload="getUser()">
+        <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+            <h5 class="my-0 mr-md-auto font-weight-normal">Project name</h5>
+                <nav class="my-2 my-md-0 mr-md-3">
+                  <a class="p-2 text-dark" href="#">Features</a>
+                </nav>
+        </div>
+        <div class="container">
+                <div class="alert alert-success" id="success-message" role="alert" style="visibility:hidden;">
+                        Clicked text successfulle saved to clipboard!
+                </div>
+            <div class="row">
+                <div id="placeForCard" class="col-md-6 offset-md-3">
+                    <button id="firstCallUser" class="btn btn-primary form-control">Get User</button>
+                </div>
+            </div>
+        </div>
+            <footer class="footer">
+                <div class="container">
+                    <span class="text-muted">Place sticky footer content here.</span>
+                </div>
+            </footer>   
+        <script>
+        
+        const place = document.querySelector('#placeForCard');
+        const firstUser = document.querySelector('#firstCallUser');
+        const successMessage = document.querySelector('#success-message');
+        let nodes;
+        let secondUser;
+        let getAnotherUser;
+        let user;
+
+        firstUser.addEventListener('click', showUser);
+
+        function changeStyle(){
+            console.log('successMessage', successMessage);
+                successMessage.style.visibility = 'hidden';
+        }
+
+       
+        
+        
+        function getUser(){
+            fetch('https://randomuser.me/api/')
+            .then((response) => response.json())
+            .then((results) => user = results.results[0])
+        };
+
+        function showUser(){
+            place.innerHTML = `
+                <div class="card"">
+                    <img class="card-img-top" src="${user.picture.large}" alt="Card image cap">
+                        <div class="card-body">
+                          <h5 class="card-title">${user.name.first.toUpperCase()} ${user.name.last.toUpperCase()}</h5>
+                          <br>
+                          <ul>
+                          <li><strong>Gender: </strong>${user.gender}</li>
+                          <hr>
+                          <li><strong>Email: </strong>${user.email}</li>
+                          <hr>
+                          <li><strong>Phone: </strong>${user.phone}</li>
+                          <hr>
+                          <li><strong>City: </strong>${user.location.city}</li>
+                          <hr>
+                          <li><strong>PostCode: </strong>${user.location.postcode}</li>
+                          <hr>
+                          <li><strong>Street: </strong>${user.location.street}</li>
+                          <hr>
+                          </ul>
+                          <a href="#" id="getAnotherUser" class="btn btn-primary form-control">Get another user</a>
+                </div>
+            `;
+            getUser();
+            getAnotherUser = document.querySelector('#getAnotherUser').addEventListener('click', showUser);
+            nodes = document.querySelectorAll('li');
+            getLi();
+        }
+
+        function getLi(){
+            for(let i = 0; i < nodes.length; i++){
+                nodes[i].setAttribute('id', i);
+                nodes[i].addEventListener('click', copyValue => {
+                    if(copyValue){
+                        let newField = document.createElement("textarea");                        
+                        let copy = nodes[i].innerText.split(":");
+                        copy = copy[1];
+                        document.body.appendChild(newField);
+                        newField.value = copy;
+                        newField.select();
+                        if(document.execCommand('copy')){
+                            document.querySelector('#success-message').setAttribute("style", "visibility:visible;")
+                            setTimeout(changeStyle, 3000);
+                        }
+                        document.body.removeChild(newField);
+                    }
+                });
+            }
+        }
+        
+        </script>
+</body>
+</html>
